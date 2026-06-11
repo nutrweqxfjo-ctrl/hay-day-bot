@@ -23,6 +23,8 @@ class CropManager:
             x, y = field['position']
             
             logger.info(f'جاري زراعة {crop_type} في الموضع ({x}, {y})')
+            
+            pyautogui.moveTo(x, y, duration=0.3)
             pyautogui.click(x, y)
             time.sleep(self.config.CLICK_DELAY)
             
@@ -52,7 +54,10 @@ class CropManager:
             
             logger.info(f'جاري حصاد المحصول من الموضع ({x}, {y})')
             
-            pyautogui.doubleClick(x, y, interval=0.2)
+            pyautogui.moveTo(x, y, duration=0.2)
+            pyautogui.click(x, y)
+            time.sleep(0.2)
+            pyautogui.click(x, y)
             time.sleep(self.config.CLICK_DELAY)
             
             self.harvested_count += 1
@@ -70,14 +75,15 @@ class CropManager:
     def select_crop_from_menu(self, crop_type):
         try:
             crop_positions = {
-                'wheat': (320, 400),
-                'corn': (420, 400),
-                'carrot': (520, 400),
-                'tomato': (620, 400)
+                'wheat': (300, 400),
+                'corn': (400, 400),
+                'carrot': (500, 400),
+                'tomato': (600, 400)
             }
             
             if crop_type in crop_positions:
                 x, y = crop_positions[crop_type]
+                pyautogui.moveTo(x, y, duration=0.2)
                 pyautogui.click(x, y)
                 time.sleep(self.config.CLICK_DELAY)
                 logger.info(f'تم اختيار {crop_type} من القائمة')

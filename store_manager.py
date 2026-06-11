@@ -25,6 +25,7 @@ class StoreManager:
             store_button = self.find_store_button()
             
             if store_button:
+                pyautogui.moveTo(store_button[0], store_button[1], duration=0.3)
                 pyautogui.click(*store_button)
                 time.sleep(1)
                 
@@ -64,6 +65,7 @@ class StoreManager:
                 item_position = self.find_sellable_item()
                 
                 if item_position:
+                    pyautogui.moveTo(item_position[0], item_position[1], duration=0.2)
                     pyautogui.click(*item_position)
                     time.sleep(0.3)
                     

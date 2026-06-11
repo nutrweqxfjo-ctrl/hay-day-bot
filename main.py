@@ -1,5 +1,5 @@
 '''
-تطبيق بوت هاي داي - نظام أتمتة شامل لزراعة وحصاد وبيع المحاصيل
+تطبيق بوت هاي داي - نظام أتمتة زراعة وحصاد البيع
 Hay Day Bot - Automated system for planting, harvesting, and selling crops
 '''
 
@@ -43,6 +43,10 @@ class HayDayBot:
         try:
             while self.running:
                 screenshot = self.screen_analyzer.capture_screen()
+                if screenshot is None:
+                    time.sleep(1)
+                    continue
+                    
                 game_state = self.screen_analyzer.analyze_screen(screenshot)
                 
                 self.process_game_state(game_state)
@@ -63,25 +67,17 @@ class HayDayBot:
         if game_state.get('harvestable_crops'):
             harvest_count = len(game_state['harvestable_crops'])
             logger.info(f'عدد المحاصيل الجاهزة للحصاد: {harvest_count}')
-            for crop in game_state['harvestable_crops']:
+            for crop in game_state['harvestable_crops'][:self.config.MAX_CROPS_PER_CYCLE]:
                 self.crop_manager.harvest_crop(crop)
                 time.sleep(0.5)
         
         if game_state.get('empty_fields'):
             empty_count = len(game_state['empty_fields'])
             logger.info(f'عدد الحقول الفارغة: {empty_count}')
-            for field in game_state['empty_fields']:
+            for field in game_state['empty_fields'][:self.config.MAX_CROPS_PER_CYCLE]:
                 crop_to_plant = self.crop_manager.get_best_crop_to_plant()
                 self.crop_manager.plant_crop(field, crop_to_plant)
                 time.sleep(0.5)
-        
-        if game_state.get('inventory_ready_for_sale'):
-            logger.info('جاري بيع المحاصيل في المتجر')
-            self.store_manager.sell_crops()
-            time.sleep(1)
-        
-        profit = game_state.get('daily_profit', 0)
-        logger.info(f'الأرباح اليومية المتوقعة: {profit} عملة')
     
     def stop_bot(self):
         logger.info('جاري إيقاف البوت')
@@ -100,8 +96,8 @@ def main():
     logger.info('بدء تطبيق بوت هاي داي')
     logger.info('='*60)
     
-    logger.info('\nتأكد من أن BlueStacks مفتوح واللعبة نشطة')
-    logger.info('سيتم البدء في 3 ثوان\n')
+    logger.info('\nتأكد من أن BlueStacks مفتوح والعبة نشطة')
+    logger.info('سيتم البدء في 3 ثواني\n')
     time.sleep(3)
     
     bot = HayDayBot()
