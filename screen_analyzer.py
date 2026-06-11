@@ -56,10 +56,10 @@ class ScreenAnalyzer:
         try:
             hsv = cv2.cvtColor(screenshot, cv2.COLOR_BGR2HSV)
             
-            lower_gold = np.array([15, 100, 150])
-            upper_gold = np.array([35, 255, 255])
+            lower_yellow = np.array([20, 80, 180])
+            upper_yellow = np.array([50, 255, 255])
             
-            mask = cv2.inRange(hsv, lower_gold, upper_gold)
+            mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
             
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
             mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
@@ -69,11 +69,11 @@ class ScreenAnalyzer:
             
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if 500 < area < 5000:
+                if 500 < area < 15000:
                     x, y, w, h = cv2.boundingRect(contour)
                     aspect_ratio = float(w) / h if h != 0 else 0
                     
-                    if 0.5 < aspect_ratio < 2.0:
+                    if 0.3 < aspect_ratio < 3.0:
                         center_x = x + w // 2
                         center_y = y + h // 2
                         
@@ -85,7 +85,7 @@ class ScreenAnalyzer:
                                 'width': w,
                                 'height': h
                             })
-                            logger.info(f'كشف محصول ناضج في ({center_x}, {center_y})')
+                            logger.info(f'كشف محصول ناضج في ({center_x}, {center_y}) مساحة: {area}')
         except Exception as e:
             logger.warning(f'خطأ في كشف المحاصيل: {str(e)}')
         
@@ -97,8 +97,8 @@ class ScreenAnalyzer:
         try:
             hsv = cv2.cvtColor(screenshot, cv2.COLOR_BGR2HSV)
             
-            lower_brown = np.array([10, 40, 60])
-            upper_brown = np.array([20, 120, 150])
+            lower_brown = np.array([8, 30, 50])
+            upper_brown = np.array([25, 150, 180])
             
             mask = cv2.inRange(hsv, lower_brown, upper_brown)
             
@@ -109,11 +109,11 @@ class ScreenAnalyzer:
             
             for contour in contours:
                 area = cv2.contourArea(contour)
-                if 400 < area < 4000:
+                if 300 < area < 8000:
                     x, y, w, h = cv2.boundingRect(contour)
                     aspect_ratio = float(w) / h if h != 0 else 0
                     
-                    if 0.6 < aspect_ratio < 2.0:
+                    if 0.5 < aspect_ratio < 3.0:
                         center_x = x + w // 2
                         center_y = y + h // 2
                         
@@ -125,7 +125,7 @@ class ScreenAnalyzer:
                                 'width': w,
                                 'height': h
                             })
-                            logger.info(f'كشف حقل فارغ في ({center_x}, {center_y})')
+                            logger.info(f'كشف حقل فارغ في ({center_x}, {center_y}) مساحة: {area}')
         except Exception as e:
             logger.warning(f'خطأ في كشف الحقول: {str(e)}')
         
