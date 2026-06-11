@@ -69,7 +69,7 @@ class HayDayBot:
             logger.info(f'عدد المحاصيل الجاهزة للحصاد: {harvest_count}')
             for crop in game_state['harvestable_crops'][:self.config.MAX_CROPS_PER_CYCLE]:
                 self.crop_manager.harvest_crop(crop)
-                time.sleep(0.5)
+                time.sleep(0.8)
         
         if game_state.get('empty_fields'):
             empty_count = len(game_state['empty_fields'])
@@ -77,12 +77,15 @@ class HayDayBot:
             for field in game_state['empty_fields'][:self.config.MAX_CROPS_PER_CYCLE]:
                 crop_to_plant = self.crop_manager.get_best_crop_to_plant()
                 self.crop_manager.plant_crop(field, crop_to_plant)
-                time.sleep(0.5)
+                time.sleep(0.8)
     
     def stop_bot(self):
         logger.info('جاري إيقاف البوت')
         self.running = False
         logger.info('تم إيقاف البوت بنجاح')
+        
+        stats = self.crop_manager.get_statistics()
+        logger.info(f'الإحصائيات النهائية: {stats}')
 
 def main():
     print('\n')

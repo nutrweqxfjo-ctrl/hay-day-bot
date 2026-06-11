@@ -1,5 +1,5 @@
 '''
-مدير المحاصيل - Crop management and automation
+مدير المحاصيل المحسّن - Crop manager with proper harvesting
 '''
 
 import pyautogui
@@ -25,6 +25,7 @@ class CropManager:
             logger.info(f'جاري زراعة {crop_type} في الموضع ({x}, {y})')
             
             pyautogui.moveTo(x, y, duration=0.3)
+            time.sleep(0.2)
             pyautogui.click(x, y)
             time.sleep(self.config.CLICK_DELAY)
             
@@ -55,10 +56,19 @@ class CropManager:
             logger.info(f'جاري حصاد المحصول من الموضع ({x}, {y})')
             
             pyautogui.moveTo(x, y, duration=0.2)
+            time.sleep(0.3)
+            
             pyautogui.click(x, y)
-            time.sleep(0.2)
-            pyautogui.click(x, y)
-            time.sleep(self.config.CLICK_DELAY)
+            time.sleep(0.3)
+            
+            logger.info('جاري سحب المعول على المحصول للحصاد')
+            
+            offset_x = 20
+            offset_y = 20
+            
+            pyautogui.drag(offset_x, offset_y, duration=0.5)
+            
+            time.sleep(0.3)
             
             self.harvested_count += 1
             logger.info(f'تم الحصاد بنجاح (الإجمالي: {self.harvested_count})')
@@ -84,6 +94,7 @@ class CropManager:
             if crop_type in crop_positions:
                 x, y = crop_positions[crop_type]
                 pyautogui.moveTo(x, y, duration=0.2)
+                time.sleep(0.1)
                 pyautogui.click(x, y)
                 time.sleep(self.config.CLICK_DELAY)
                 logger.info(f'تم اختيار {crop_type} من القائمة')
