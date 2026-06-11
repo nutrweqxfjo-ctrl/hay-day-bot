@@ -1,6 +1,6 @@
 '''
-تطبيق بوت هاي داي - نظام أتمتة زراعة وحصاد البيع
-Hay Day Bot - Automated system for planting, harvesting, and selling crops
+تطبيق بوت هاي داي - Hay Day Bot Application
+تم تحسينه بناءً على أفضل الممارسات
 '''
 
 import cv2
@@ -13,6 +13,7 @@ from config import Config
 from crop_manager import CropManager
 from screen_analyzer import ScreenAnalyzer
 from store_manager import StoreManager
+from game_analyzer import GameAnalyzer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,7 +32,9 @@ class HayDayBot:
         self.crop_manager = CropManager()
         self.screen_analyzer = ScreenAnalyzer()
         self.store_manager = StoreManager()
+        self.game_analyzer = GameAnalyzer()
         self.running = False
+        self.cycle_count = 0
         logger.info('تم تهيئة نظام بوت هاي داي بنجاح')
         
     def start_bot(self):
@@ -42,6 +45,14 @@ class HayDayBot:
         
         try:
             while self.running:
+                self.cycle_count += 1
+                logger.info(f'\nالدورة #{self.cycle_count}')
+                
+                if not self.game_analyzer.is_game_window_active():
+                    logger.warning('نافذة اللعبة غير نشطة')
+                    time.sleep(2)
+                    continue
+                
                 screenshot = self.screen_analyzer.capture_screen()
                 if screenshot is None:
                     time.sleep(1)
@@ -67,25 +78,34 @@ class HayDayBot:
         if game_state.get('harvestable_crops'):
             harvest_count = len(game_state['harvestable_crops'])
             logger.info(f'عدد المحاصيل الجاهزة للحصاد: {harvest_count}')
-            for crop in game_state['harvestable_crops'][:self.config.MAX_CROPS_PER_CYCLE]:
+            
+            for idx, crop in enumerate(game_state['harvestable_crops'][:self.config.MAX_CROPS_PER_CYCLE]):
+                logger.info(f'حصاد المحصول {idx+1}/{min(len(game_state["harvestable_crops"]), self.config.MAX_CROPS_PER_CYCLE)}')
                 self.crop_manager.harvest_crop(crop)
-                time.sleep(0.8)
+                time.sleep(1.0)
         
         if game_state.get('empty_fields'):
             empty_count = len(game_state['empty_fields'])
             logger.info(f'عدد الحقول الفارغة: {empty_count}')
-            for field in game_state['empty_fields'][:self.config.MAX_CROPS_PER_CYCLE]:
+            
+            for idx, field in enumerate(game_state['empty_fields'][:self.config.MAX_CROPS_PER_CYCLE]):
+                logger.info(f'زراعة الحقل {idx+1}/{min(len(game_state["empty_fields"]), self.config.MAX_CROPS_PER_CYCLE])}')
                 crop_to_plant = self.crop_manager.get_best_crop_to_plant()
                 self.crop_manager.plant_crop(field, crop_to_plant)
-                time.sleep(0.8)
+                time.sleep(1.0)
     
     def stop_bot(self):
         logger.info('جاري إيقاف البوت')
         self.running = False
-        logger.info('تم إيقاف البوت بنجاح')
         
         stats = self.crop_manager.get_statistics()
-        logger.info(f'الإحصائيات النهائية: {stats}')
+        logger.info('الإحصائيات النهائية:')
+        logger.info(f'  المحاصيل المزروعة: {stats["planted_count"]}')
+        logger.info(f'  المحاصيل المحصودة: {stats["harvested_count"]}')
+        logger.info(f'  محاولات الحصاد: {stats["harvest_attempts"]}')
+        logger.info(f'  المحاصيل النشطة: {stats["active_crops"]}')
+        logger.info(f'  متوسط الربح: {stats["average_profit"]}')
+        logger.info('تم إيقاف البوت بنجاح')
 
 def main():
     print('\n')

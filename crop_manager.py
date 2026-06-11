@@ -1,5 +1,5 @@
 '''
-مدير المحاصيل المحسّن - Crop manager with proper harvesting
+مدير المحاصيل المتقدم - Advanced crop manager with proper harvesting
 '''
 
 import pyautogui
@@ -16,6 +16,7 @@ class CropManager:
         self.planted_crops = {}
         self.harvested_count = 0
         self.planted_count = 0
+        self.harvest_attempts = 0
         logger.info('تم تهيئة مدير المحاصيل')
     
     def plant_crop(self, field, crop_type):
@@ -27,7 +28,7 @@ class CropManager:
             pyautogui.moveTo(x, y, duration=0.3)
             time.sleep(0.2)
             pyautogui.click(x, y)
-            time.sleep(self.config.CLICK_DELAY)
+            time.sleep(self.config.CLICK_DELAY + 0.2)
             
             self.select_crop_from_menu(crop_type)
             time.sleep(0.5)
@@ -50,6 +51,9 @@ class CropManager:
             return False
     
     def harvest_crop(self, crop):
+        '''
+حصاد المحصول باستخدام سحب المعول الصحيح
+        '''
         try:
             x, y = crop['position']
             
@@ -58,19 +62,17 @@ class CropManager:
             pyautogui.moveTo(x, y, duration=0.2)
             time.sleep(0.3)
             
-            pyautogui.click(x, y)
+            pyautogui.mouseDown()
+            time.sleep(0.1)
+            
+            pyautogui.drag(15, 15, duration=0.4)
+            
+            pyautogui.mouseUp()
             time.sleep(0.3)
             
-            logger.info('جاري سحب المعول على المحصول للحصاد')
-            
-            offset_x = 20
-            offset_y = 20
-            
-            pyautogui.drag(offset_x, offset_y, duration=0.5)
-            
-            time.sleep(0.3)
-            
+            self.harvest_attempts += 1
             self.harvested_count += 1
+            
             logger.info(f'تم الحصاد بنجاح (الإجمالي: {self.harvested_count})')
             
             if crop['position'] in self.planted_crops:
@@ -139,6 +141,7 @@ class CropManager:
         return {
             'planted_count': self.planted_count,
             'harvested_count': self.harvested_count,
+            'harvest_attempts': self.harvest_attempts,
             'active_crops': len(self.planted_crops),
-            'average_profit': (self.harvested_count * 75)
+            'average_profit': (self.harvested_count * 75) if self.harvested_count > 0 else 0
         }
