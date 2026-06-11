@@ -1,4 +1,4 @@
-# Python
+Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -23,13 +23,13 @@ share/python-wheels/
 *.egg
 PIPFILE.lock
 
-# Virtual Environment
+Virtual Environment
 venv/
 ENV/
 env/
 .venv
 
-# IDE
+IDE
 .vscode/
 .idea/
 *.swp
@@ -37,24 +37,24 @@ env/
 *~
 .DS_Store
 
-# Logs
+Logs
 *.log
 hayday_bot.log
 
-# Screenshots
+Screenshots
 *.png
 *.jpg
 *.jpeg
 screenshot.png
 
-# Environment
+Environment
 .env
 .env.local
 
-# Cache
+Cache
 .cache/
 .pytest_cache/
 
-# Game
+Game
 bluestacks_data/
 saves/
